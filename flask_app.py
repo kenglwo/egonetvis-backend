@@ -2,28 +2,34 @@
 # A very simple Flask Hello World app for you to get started with...
 
 from flask import Flask, request, render_template
+import pymysql
+pymysql.install_as_MySQLdb()
 import MySQLdb
 
 app = Flask(__name__)
 
-db = MySQLdb.connect(
-    host = "egonetvis.mysql.pythonanywhere-services.com",
-    user = "egonetvis",
-    passwd = "raing9Ej",
-    db = "egonetvis$data"
-)
-
+# db = MySQLdb.connect(
+#     # host = "egonetvis.mysql.pythonanywhere-services.com",
+#     host = "localhost",
+#     user = "egonetvis",
+#     passwd = "raing9Ej",
+#     db = "egonetvis$data"
+# )
+db = MySQLdb.connect(host='localhost',
+                           user='root',
+                           passwd='',
+                           db='SampleDB')
 cursor = db.cursor()
 
 @app.route('/')
-def hello_world():
-    cursor.execute("select name from test limit 1")
-    output = ""
-    for res in cursor:
-        print(res)
-        output += res[0]
-
-    return output
+def index():
+    # cursor.execute("select name from test limit 1")
+    # output = ""
+    # for res in cursor:
+    #     print(res)
+    #     output += res[0]
+    # return output
+    return "Hello World!"
 
 @app.route('/test', methods=["GET", "POST"])
 def test():
@@ -58,3 +64,7 @@ def test():
         return output
 
     return render_template('test.html')
+
+
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=5000)
