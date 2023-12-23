@@ -11,23 +11,29 @@ DB_USER = "egonetvis"
 DB_PASSWD = "raing9Ej"
 DB_NAME = "egonetvis$data"
 
-def get_db_cursor(host, user, passwd, db): 
+def get_db_cursor(host, user, passwd, db):
     db = MySQLdb.connect(host, user, passwd, db)
     cursor = db.cursor()
-    return cursor
+    return [db, cursor]
 
 
 @app.route('/')
 def hello_world():
-    cursor = get_db_cursor(DB_HOST, DB_USER, DB_PASSWD, DB_NAME)
-    cursor.execute("select name from test limit 1")
-    output = ""
-    for res in cursor:
-        print(res)
-        output += res[0]
-    cursor.close()
+    db, cursor = get_db_cursor(DB_HOST, DB_USER, DB_PASSWD, DB_NAME)
 
-    return output
+    output = ""
+    try:
+        cursor.execute("select name from test limit 1")
+        for res in cursor:
+            print(res)
+            output += res[0]
+    except Exception:
+        output = "DB Error: unable to fetch items"
+
+    finally:
+        cursor.close()
+        db.close()
+        return output
 
 @app.route('/test', methods=["GET", "POST"])
 def test():
@@ -35,33 +41,40 @@ def test():
         name = request.form.get('name')
         age = int(request.form.get('age'))
 
-        cursor = get_db_cursor(DB_HOST, DB_USER, DB_PASSWD, DB_NAME)
-        # insert the values
-        sql = "insert into test values('{}', {})".format(name, age)
-        cursor.execute(sql)
+        output = ""
+        db, cursor = get_db_cursor(DB_HOST, DB_USER, DB_PASSWD, DB_NAME)
 
-        # fetch all data
-        cursor.execute("select name, age from test")
-        output = '''
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Age</th>
-                </tr>
-                tablerow
-            </table>
-        '''
+        try:
+            sql = "insert into test values('{}', {})".format(name, age)
+            cursor.execute(sql)
 
-        data = ""
-        for res in cursor:
-            name = res[0]
-            age = res[1]
-            data += "<tr><td>{}</td><td>{}</td></tr>".format(name, age)
+            # fetch all data
+            cursor.execute("select name, age from test")
+            output = '''
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                    </tr>
+                    tablerow
+                </table>
+            '''
 
-        output = output.replace("tablerow", data)
-        cursor.close()
+            data = ""
+            for res in cursor:
+                name = res[0]
+                age = res[1]
+                data += "<tr><td>{}</td><td>{}</td></tr>".format(name, age)
 
-        return output
+            output = output.replace("tablerow", data)
+            cursor.execute(sql)
+        except Exception:
+            output = "DB Error: unable to fetch items"
+
+        finally:
+            cursor.close()
+            db.close()
+            return output
 
     return render_template('test.html')
 
