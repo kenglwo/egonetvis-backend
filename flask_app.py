@@ -18,7 +18,6 @@ DB_USER_LOCAL = "root"
 DB_PASSWD_LOCAL = ""
 DB_NAME_LOCAL = "SampleDB"
 
-
 def get_db_cursor(host, user, passwd, db):
     db = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
     cursor = db.cursor()
@@ -41,6 +40,7 @@ def hello_world():
         cursor.close()
         db.close()
         return output
+    
 
 @app.route('/test', methods=["GET", "POST"])
 def test():
