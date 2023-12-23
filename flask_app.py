@@ -2,6 +2,8 @@
 # A very simple Flask Hello World app for you to get started with...
 
 from flask import Flask, request, render_template
+import pymysql
+pymysql.install_as_MySQLdb()
 import MySQLdb
 
 app = Flask(__name__)
@@ -11,11 +13,16 @@ DB_USER = "egonetvis"
 DB_PASSWD = "raing9Ej"
 DB_NAME = "egonetvis$data"
 
+DB_HOST_LOCAL = "localhost"
+DB_USER_LOCAL = "root"
+DB_PASSWD_LOCAL = ""
+DB_NAME_LOCAL = "SampleDB"
+
+
 def get_db_cursor(host, user, passwd, db):
-    db = MySQLdb.connect(host, user, passwd, db)
+    db = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
     cursor = db.cursor()
     return [db, cursor]
-
 
 @app.route('/')
 def hello_world():
@@ -78,3 +85,5 @@ def test():
 
     return render_template('test.html')
 
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=5000)
