@@ -6,22 +6,26 @@ import MySQLdb
 
 app = Flask(__name__)
 
-db = MySQLdb.connect(
-    host = "egonetvis.mysql.pythonanywhere-services.com",
-    user = "egonetvis",
-    passwd = "raing9Ej",
-    db = "egonetvis$data"
-)
+DB_HOST = "egonetvis.mysql.pythonanywhere-services.com"
+DB_USER = "egonetvis"
+DB_PASSWD = "raing9Ej"
+DB_NAME = "egonetvis$data"
 
-cursor = db.cursor()
+def get_db_cursor(host, user, passwd, db): 
+    db = MySQLdb.connect(host, user, passwd, db)
+    cursor = db.cursor()
+    return cursor
+
 
 @app.route('/')
 def hello_world():
+    cursor = get_db_cursor(DB_HOST, DB_USER, DB_PASSWD, DB_NAME)
     cursor.execute("select name from test limit 1")
     output = ""
     for res in cursor:
         print(res)
         output += res[0]
+    cursor.close()
 
     return output
 
@@ -31,6 +35,7 @@ def test():
         name = request.form.get('name')
         age = int(request.form.get('age'))
 
+        cursor = get_db_cursor(DB_HOST, DB_USER, DB_PASSWD, DB_NAME)
         # insert the values
         sql = "insert into test values('{}', {})".format(name, age)
         cursor.execute(sql)
@@ -54,7 +59,9 @@ def test():
             data += "<tr><td>{}</td><td>{}</td></tr>".format(name, age)
 
         output = output.replace("tablerow", data)
+        cursor.close()
 
         return output
 
     return render_template('test.html')
+
