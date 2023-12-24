@@ -8,15 +8,28 @@ import MySQLdb
 
 app = Flask(__name__)
 
-DB_HOST = "egonetvis.mysql.pythonanywhere-services.com"
-DB_USER = "egonetvis"
-DB_PASSWD = "raing9Ej"
-DB_NAME = "egonetvis$data"
+PROD = False
+
+DB_HOST_PROD = "egonetvis.mysql.pythonanywhere-services.com"
+DB_USER_PROD = "egonetvis"
+DB_PASSWD_PROD = "raing9Ej"
+DB_NAME_PROD = "egonetvis$data"
 
 DB_HOST_LOCAL = "localhost"
 DB_USER_LOCAL = "root"
 DB_PASSWD_LOCAL = ""
 DB_NAME_LOCAL = "SampleDB"
+
+if PROD:
+    DB_HOST = DB_HOST_PROD
+    DB_USER = DB_USER_PROD
+    DB_PASSWD = DB_PASSWD_PROD
+    DB_NAME = DB_NAME_PROD
+else:
+    DB_HOST = DB_HOST_LOCAL
+    DB_USER = DB_USER_LOCAL
+    DB_PASSWD = DB_PASSWD_LOCAL
+    DB_NAME = DB_NAME_LOCAL
 
 def get_db_cursor(host, user, passwd, db):
     db = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
